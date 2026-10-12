@@ -36,6 +36,7 @@ jobs:
           - { extra: agent-framework, test: test_agent_framework.py }
           - { extra: llamaindex, test: test_llamaindex.py }
           - { extra: smolagents, test: test_smolagents.py }
+          - { extra: mcp, test: test_mcp.py }
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
