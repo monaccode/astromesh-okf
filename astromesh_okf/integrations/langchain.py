@@ -1,4 +1,8 @@
-"""LangChain tools for an OKF bundle. LangGraph uses them as-is (create_react_agent, ToolNode)."""
+"""LangChain tools for an OKF bundle.
+
+Use them with `langchain.agents.create_agent` (LangGraph runtime underneath) or in a
+LangGraph `ToolNode` as-is.
+"""
 
 from __future__ import annotations
 

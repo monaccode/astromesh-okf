@@ -77,6 +77,20 @@ def _id_of(root: Path, path: Path) -> str:
     return "/" if rel == "." else rel.removesuffix(".md")
 
 
+class _AliasError(yaml.YAMLError):
+    pass
+
+
+class _NoAliasLoader(yaml.SafeLoader):
+    """SafeLoader without aliases: `&a [*a]` recurses forever and nested aliases expand
+    a few hundred bytes into megabytes (billion laughs). Frontmatter never needs them."""
+
+    def compose_node(self, parent, index):
+        if self.check_event(yaml.AliasEvent):
+            raise _AliasError
+        return super().compose_node(parent, index)
+
+
 def split_frontmatter(text: str) -> tuple[dict, str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -84,8 +98,12 @@ def split_frontmatter(text: str) -> tuple[dict, str]:
     for i in range(1, len(lines)):
         if lines[i].strip() == "---":
             try:
-                meta = yaml.safe_load("\n".join(lines[1:i]))
-            except (yaml.YAMLError, ValueError) as exc:
+                meta = yaml.load("\n".join(lines[1:i]), Loader=_NoAliasLoader)
+            except _AliasError:
+                raise InvalidConceptError(
+                    "unparseable frontmatter: aliases are not allowed"
+                ) from None
+            except (yaml.YAMLError, ValueError, RecursionError) as exc:
                 raise InvalidConceptError(
                     f"unparseable frontmatter ({exc.__class__.__name__})"
                 ) from None

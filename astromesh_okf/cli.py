@@ -6,11 +6,13 @@ import argparse
 import sys
 from pathlib import Path
 
+from astromesh_okf import __version__
 from astromesh_okf.tools import OKFTools
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="astromesh-okf", description=__doc__)
+    parser.add_argument("--version", action="version", version=f"astromesh-okf {__version__}")
     sub = parser.add_subparsers(dest="cmd", required=True)
     mcp = sub.add_parser("mcp", help="serve the bundle's tools over MCP (stdio)")
     mcp.add_argument("bundle")
@@ -36,7 +38,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "mcp":
         from astromesh_okf.mcp import build_server
 
-        build_server(args.bundle, prefix=args.prefix).run()
+        try:
+            server = build_server(args.bundle, prefix=args.prefix)
+        except ImportError as exc:
+            print(f"astromesh-okf: {exc}", file=sys.stderr)
+            return 2
+        server.run()
         return 0
     tools = OKFTools(args.bundle)
     if args.cmd == "index":

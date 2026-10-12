@@ -149,3 +149,11 @@ def test_index_md_non_utf8_raises_bundle_error(tmp_path):
     (tmp_path / "index.md").write_bytes(b"\xff\xfe\x00")
     with pytest.raises(BundleError, match=r"^invalid index: /$"):
         Bundle(tmp_path).index("/")
+
+
+def test_find_counts_yaml_alias_concepts_as_invalid(tmp_path):
+    (tmp_path / "ok.md").write_text("---\ntype: X\n---\n")
+    (tmp_path / "loop.md").write_text("---\ntype: X\nfoo: &a [*a]\n---\n")
+    r = Bundle(tmp_path).find()
+    assert [c["id"] for c in r["results"]] == ["ok"]
+    assert r["skipped_invalid"] == 1

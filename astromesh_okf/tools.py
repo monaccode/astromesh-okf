@@ -97,7 +97,9 @@ def _run(fn, *args, **kwargs) -> str:
         return json.dumps({"error": str(exc)}, ensure_ascii=False)
     # permissions, a file vanishing between listing and reading, or a stray ValueError
     except (OSError, ValueError) as exc:
-        return json.dumps({"error": f"bundle read failed: {exc}"}, ensure_ascii=False)
+        # never str(exc): an OSError carries the absolute path of the file
+        reason = getattr(exc, "strerror", None) or type(exc).__name__
+        return json.dumps({"error": f"bundle read failed: {reason}"}, ensure_ascii=False)
     return data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
 
 

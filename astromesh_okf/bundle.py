@@ -45,6 +45,12 @@ def _clean(raw: str) -> str:
     return str(raw or "").split("#", 1)[0].strip().lstrip("/")
 
 
+def _echo(raw: str) -> str:
+    """The model's input, short enough to echo back in an error."""
+    raw = str(raw)
+    return raw if len(raw) <= 200 else raw[:200] + "..."
+
+
 def _strip_frontmatter(text: str) -> str:
     """An `index.md` only carries frontmatter at the root (`okf_version`, §12); drop it."""
     try:
@@ -78,9 +84,9 @@ class Bundle:
         try:
             path = (self.root / rel).resolve()
         except (OSError, ValueError):
-            raise OutsideBundleError(f"outside bundle: {raw}") from None
+            raise OutsideBundleError(f"outside bundle: {_echo(raw)}") from None
         if not path.is_relative_to(self.root):
-            raise OutsideBundleError(f"outside bundle: {raw}")
+            raise OutsideBundleError(f"outside bundle: {_echo(raw)}")
         return path
 
     def _concept_path(self, raw: str) -> Path:
@@ -119,7 +125,7 @@ class Bundle:
             exists = path.exists()
             is_dir = path.is_dir()
         except (OSError, ValueError):
-            raise OutsideBundleError(f"outside bundle: {concept_id}") from None
+            raise OutsideBundleError(f"outside bundle: {_echo(concept_id)}") from None
         if not exists:
             raise ConceptNotFoundError(self._not_found(cid))
         if is_dir or path.suffix != ".md" or path.name in RESERVED:
@@ -168,8 +174,12 @@ class Bundle:
 
     def index(self, path: str = "/", now: datetime | None = None) -> str:
         folder = self._inside(_clean(path), path)
-        if not folder.is_dir():
-            raise BundleError(f"not a directory: {path}")
+        try:
+            is_dir = folder.is_dir()
+        except (OSError, ValueError):
+            raise OutsideBundleError(f"outside bundle: {_echo(path)}") from None
+        if not is_dir:
+            raise BundleError(f"not a directory: {_echo(path)}")
         existing = folder / "index.md"
         if existing.is_file() and existing.resolve().is_relative_to(self.root):
             try:

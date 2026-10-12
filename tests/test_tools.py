@@ -2,8 +2,11 @@
 
 import inspect
 import json
+import os
 import sys
 from pathlib import Path
+
+import pytest
 
 from astromesh_okf import Bundle, OKFTools
 from astromesh_okf.tools import DESCRIPTIONS, PARAMS, TOOL_NAMES
@@ -84,3 +87,30 @@ def test_importing_the_package_imports_no_framework():
         "mcp",
     ):
         assert mod not in sys.modules, mod
+
+
+def test_kb_read_yaml_alias_is_an_error(tmp_path):
+    (tmp_path / "loop.md").write_text("---\ntype: X\nfoo: &a [*a]\n---\n")
+    t = OKFTools(tmp_path)
+    assert "aliases are not allowed" in json.loads(t.kb_read("loop"))["error"]
+    assert "(1 concept(s) skipped" in t.kb_index("/")
+
+
+def test_kb_index_oversized_name_is_outside_bundle():
+    err = json.loads(OKFTools(FIX).kb_index("a" * 5000))["error"]
+    assert err.startswith("outside bundle")
+    assert len(err) < 300
+
+
+@pytest.mark.skipif(not hasattr(os, "geteuid") or os.geteuid() == 0, reason="needs non-root POSIX")
+def test_unreadable_dir_error_has_no_absolute_path(tmp_path):
+    locked = tmp_path / "locked"
+    locked.mkdir()
+    locked.chmod(0)
+    try:
+        err = json.loads(OKFTools(tmp_path).kb_index("locked"))["error"]
+    finally:
+        locked.chmod(0o755)
+    assert err.startswith("bundle read failed: ")
+    assert str(tmp_path) not in err
+    assert str(tmp_path.resolve()) not in err

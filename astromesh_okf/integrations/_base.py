@@ -13,9 +13,10 @@ def require(module: str, extra: str) -> ModuleType:
     try:
         return importlib.import_module(module)
     except ImportError as exc:
-        raise ImportError(
-            f"{module} is not installed. Install it with: pip install 'astromesh-okf[{extra}]'"
-        ) from exc
+        msg = f"{module} is not installed. Install it with: pip install 'astromesh-okf[{extra}]'"
+        if extra == "pydantic-ai":
+            msg += " (requires Python >= 3.11)"
+        raise ImportError(msg) from exc
 
 
 def py_type(p: Param):

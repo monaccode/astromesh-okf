@@ -27,3 +27,8 @@ def test_invoke_with_a_single_argument():
 
 def test_prefix():
     assert next(t.name for t in okf_tools(FIX, prefix="acme_")) == "acme_kb_index"
+
+
+def test_errors_flow_through_the_adapter():
+    out = json.loads(okf_tools(FIX)[1].invoke({"concept_id": "../outside"}))
+    assert out["error"].startswith("outside bundle")

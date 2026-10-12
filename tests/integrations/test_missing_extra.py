@@ -16,3 +16,12 @@ def test_missing_framework_names_the_extra(monkeypatch):
     monkeypatch.setattr(importlib, "import_module", fake)
     with pytest.raises(ImportError, match=r"pip install 'astromesh-okf\[crewai\]'"):
         require("crewai.tools", "crewai")
+
+
+def test_pydantic_ai_names_the_python_floor(monkeypatch):
+    def fake(name, *a, **k):
+        raise ImportError("no pydantic_ai")
+
+    monkeypatch.setattr(importlib, "import_module", fake)
+    with pytest.raises(ImportError, match=r"\(requires Python >= 3\.11\)$"):
+        require("pydantic_ai", "pydantic-ai")

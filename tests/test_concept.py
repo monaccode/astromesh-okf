@@ -2,6 +2,7 @@
 
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -185,3 +186,25 @@ def test_unreadable_file_is_invalid(tmp_path):
     (tmp_path / "d.md").mkdir()
     with pytest.raises(InvalidConceptError, match="unreadable"):
         parse_concept(tmp_path, tmp_path / "d.md")
+
+
+SELF_ALIAS = "---\ntype: X\nfoo: &a [*a]\n---\nbody\n"
+ALIAS_BOMB = (
+    "---\ntype: X\n"
+    'a: &a ["x","x","x","x","x","x","x","x","x"]\n'
+    "b: &b [*a,*a,*a,*a,*a,*a,*a,*a,*a]\n"
+    "c: &c [*b,*b,*b,*b,*b,*b,*b,*b,*b]\n"
+    "d: &d [*c,*c,*c,*c,*c,*c,*c,*c,*c]\n"
+    "e: &e [*d,*d,*d,*d,*d,*d,*d,*d,*d]\n"
+    "f: &f [*e,*e,*e,*e,*e,*e,*e,*e,*e]\n"
+    "g: &g [*f,*f,*f,*f,*f,*f,*f,*f,*f]\n"
+    "---\n"
+)
+
+
+@pytest.mark.parametrize("text", [SELF_ALIAS, ALIAS_BOMB], ids=["self", "bomb"])
+def test_yaml_aliases_are_rejected_fast(tmp_path, text):
+    start = time.monotonic()
+    with pytest.raises(InvalidConceptError, match=r"^invalid concept x: .*aliases are not allowed"):
+        _tmp(tmp_path, text)
+    assert time.monotonic() - start < 1
