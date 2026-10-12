@@ -47,5 +47,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      - run: git clone --depth 1 https://github.com/GoogleCloudPlatform/open-knowledge-format /tmp/okf
-      - run: uv run python scripts/check_google_samples.py /tmp/okf
+      - run: uv sync --locked
+      # pinned: a moving upstream must not turn CI red without a commit here
+      - run: |
+          git clone https://github.com/GoogleCloudPlatform/open-knowledge-format /tmp/okf
+          git -C /tmp/okf checkout ad30107c31c06aec8a7d5636e0d1058118604e6f
+      - run: uv run --locked python scripts/check_google_samples.py /tmp/okf
