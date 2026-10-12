@@ -18,10 +18,15 @@ QUESTION = "Can I get a refund after 3 weeks on the Team plan?"
 BUNDLE = Path(__file__).parent / "bundles" / "support"
 SYSTEM = "Answer using the knowledge base tools. Bundle index:\n" + Bundle(BUNDLE).index("/")
 
+
+async def main(agent: FunctionAgent) -> None:
+    print(await agent.run(QUESTION))
+
+
 if __name__ == "__main__":
     agent = FunctionAgent(
         tools=okf_tools(BUNDLE),
         llm=OpenAI(model=os.getenv("OKF_EXAMPLE_MODEL", "gpt-4.1-mini")),
         system_prompt=SYSTEM,
     )
-    print(asyncio.run(agent.run(QUESTION)))
+    asyncio.run(main(agent))

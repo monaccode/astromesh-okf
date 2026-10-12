@@ -1,6 +1,6 @@
 """PydanticAI agent over an OKF bundle.
 
-pip install 'astromesh-okf[pydantic-ai]'
+pip install 'astromesh-okf[pydantic-ai]' 'pydantic-ai-slim[openai]'
 export OPENAI_API_KEY=...   # model: OKF_EXAMPLE_MODEL (default openai:gpt-4.1-mini)
 """
 
