@@ -30,6 +30,10 @@ jobs:
         include:
           - { extra: langchain, test: test_langchain.py }
           - { extra: crewai, test: test_crewai.py }
+          - { extra: adk, test: test_adk.py }
+          - { extra: openai-agents, test: test_openai_agents.py }
+          - { extra: pydantic-ai, test: test_pydantic_ai.py }
+          - { extra: agent-framework, test: test_agent_framework.py }
           - { extra: llamaindex, test: test_llamaindex.py }
           - { extra: smolagents, test: test_smolagents.py }
     steps:
