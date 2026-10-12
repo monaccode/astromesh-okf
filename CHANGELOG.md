@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this project are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
+[Semantic Versioning](https://semver.org/).
+
+## [0.1.0] - 2026-10-12
+
+### Added
+
+- `Bundle`: read-only access to an OKF v0.2 bundle (`index`, `read`, `find`), ported from
+  the Astromesh core 0.68.0 reader. Tolerant parsing per OKF §11, trust (`verified`),
+  freshness (`stale_after`), `status` and warnings; links resolved to concept ids; paths
+  confined to the bundle root with symlinks resolved first.
+- `OKFTools`: `kb_index`, `kb_read` and `kb_find` as string-returning, never-raising tools
+  with argument coercion and a `prefix` for several bundles in one agent.
+- Framework adapters, each an optional extra: LangChain/LangGraph (`langchain`), CrewAI
+  (`crewai`), Google ADK (`adk`), OpenAI Agents SDK (`openai-agents`), PydanticAI
+  (`pydantic-ai`, Python 3.11+), LlamaIndex (`llamaindex`), smolagents (`smolagents`) and
+  Microsoft Agent Framework (`agent-framework`).
+- MCP server (`mcp` extra) and the `astromesh-okf` CLI: `mcp`, `index`, `read`, `find`.
+- Runnable examples for every framework, MCP configs for Claude Desktop and Cursor, and a
+  sample `support` bundle.
+- CI: core tests on Python 3.10–3.13, one job per extra, and a check that reads Google's
+  four sample bundles with zero concepts skipped.
+
+[0.1.0]: https://github.com/monaccode/astromesh-okf/releases/tag/v0.1.0
