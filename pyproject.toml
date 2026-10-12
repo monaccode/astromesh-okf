@@ -55,3 +55,7 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["F", "E4", "E7", "E9", "W", "I", "UP", "B", "C4", "SIM", "RET", "PERF", "PIE", "DTZ", "LOG", "G", "PT", "N", "PTH", "RUF", "BLE", "PLE", "PLW"]
+
+[tool.ruff.lint.per-file-ignores]
+# Optional/Union on purpose: google-adk's schema builder rejects `X | None` (see module docstring).
+"astromesh_okf/tools.py" = ["UP007", "UP045"]
