@@ -5,10 +5,10 @@
 [![PyPI](https://img.shields.io/pypi/v/astromesh-okf)](https://pypi.org/project/astromesh-okf/)
 [![Python](https://img.shields.io/pypi/pyversions/astromesh-okf)](https://pypi.org/project/astromesh-okf/)
 [![CI](https://github.com/monaccode/astromesh-okf/actions/workflows/ci.yml/badge.svg)](https://github.com/monaccode/astromesh-okf/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/monaccode/astromesh-okf/blob/main/LICENSE)
 [![OKF v0.2](https://img.shields.io/badge/OKF-v0.2-6f42c1)](https://github.com/GoogleCloudPlatform/open-knowledge-format)
 
-*[Read in English](README.md)*
+*[Read in English](https://github.com/monaccode/astromesh-okf/blob/main/README.md)*
 
 El [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format)
 (OKF) es un formato de archivos planos para conocimiento curado: un *bundle* es un
@@ -37,6 +37,8 @@ sequenceDiagram
     K-->>A: aviso DEPRECATED, no usar para trabajo nuevo
     A-->>U: Sí, dentro de los 30 días. Fuente policies/refunds
 ```
+
+(El diagrama se ve [en GitHub](https://github.com/monaccode/astromesh-okf/blob/main/README.es.md).)
 
 ## Inicio rápido (30 segundos)
 
@@ -75,7 +77,7 @@ print(kb.kb_read("policies/refunds"))
 ```
 
 ¿Todavía no tenés un bundle? Probá con el de este repo:
-`astromesh-okf index examples/bundles/support` (ver [examples/](examples/README.md)).
+`astromesh-okf index examples/bundles/support` (ver [examples/](https://github.com/monaccode/astromesh-okf/blob/main/examples/README.md)).
 
 ## Por qué navegar en vez de RAG
 
@@ -86,7 +88,7 @@ concepto y si está vencido o deprecado, y puede citar el id del concepto del qu
 respuesta. No se embebe ni se indexa nada de antemano: cada llamada lee los archivos, así
 que una edición del bundle se ve en la siguiente llamada a una tool.
 
-**RAG gana** con corpus enormes y sin estructura: miles de documentos sin estructura que
+**RAG gana** con corpus enormes y desordenados: miles de documentos sin una estructura que
 seguir. `kb_find` es un recorrido simple: parsea todos los archivos de conceptos en cada
 llamada, lo que anda bien para cientos o unos pocos miles de conceptos y es la herramienta
 equivocada más allá de eso.
@@ -125,10 +127,14 @@ JSON con el que el modelo puede actuar, y un concepto inexistente viene con suge
 
 **Los modelos inventan argumentos.** Vimos `limit="2"`, `tags="finance"` en vez de una
 lista e `include_deprecated="false"` como string; los frameworks con schema estricto mandan
-`null` en cada argumento opcional. La coerción vive en la capa de tools: los números se
-parsean (con un default cuando no lo son), un tag suelto se vuelve lista,
-`"true"`/`"1"`/`"yes"` significan true y cualquier otro string false, y `null` significa
-el default.
+`null` en cada argumento opcional. Donde el framework pasa los argumentos tal cual
+(funciones planas y `OKFTools`, LlamaIndex, smolagents, Google ADK), la capa de tools los
+coerciona: los números se parsean (con un default cuando no lo son), un tag suelto se
+vuelve lista, `"true"`/`"1"`/`"yes"` significan true y cualquier otro string false, y
+`null` significa el default. LangChain, CrewAI, OpenAI Agents, Agent Framework, PydanticAI
+y MCP validan los argumentos contra el schema antes: parsean `"2"` y `"false"` por su
+cuenta, rechazan lo que no encaja (`limit="many"`, `tags="finance"`) y le reportan el error
+al modelo para que reintente. En los dos casos el loop del agente no se cae.
 
 **El confinamiento de rutas tiene que resolver symlinks antes de chequear.** Un id de
 concepto es una ruta que viene del modelo, o sea, entrada no confiable. La ruta se resuelve
@@ -145,7 +151,7 @@ y los cuentan (`skipped_invalid`); nunca son fatales.
 **Verificado contra lo real.** Los cuatro bundles de muestra de Google (`acme_retail` 9
 conceptos, `crypto_bitcoin` 9, `ga4` 9, `stackoverflow` 26) se indexan, se buscan y se leen
 de punta a punta sin omitir ningún concepto, en cada corrida de CI
-([scripts/check_google_samples.py](scripts/check_google_samples.py)).
+([scripts/check_google_samples.py](https://github.com/monaccode/astromesh-okf/blob/main/scripts/check_google_samples.py)).
 
 **Detalles chicos que importan.** Las firmas de las tools usan `typing.Optional` porque el
 generador de schemas de Google ADK rechaza `X | None`. Las tools devuelven strings porque es
@@ -156,21 +162,21 @@ framework.
 
 | Framework | Extra | Import | Ejemplo |
 |---|---|---|---|
-| LangChain / LangGraph | `langchain` | `from astromesh_okf.integrations.langchain import okf_tools` | [langgraph_agent.py](examples/langgraph_agent.py) |
-| CrewAI | `crewai` | `from astromesh_okf.integrations.crewai import okf_tools` | [crewai_crew.py](examples/crewai_crew.py) |
-| Google ADK | `adk` | `from astromesh_okf.integrations.adk import okf_tools` | [adk_agent.py](examples/adk_agent.py) |
-| OpenAI Agents SDK | `openai-agents` | `from astromesh_okf.integrations.openai_agents import okf_tools` | [openai_agents_agent.py](examples/openai_agents_agent.py) |
-| PydanticAI (Python 3.11+) | `pydantic-ai` | `from astromesh_okf.integrations.pydantic_ai import okf_tools` | [pydantic_ai_agent.py](examples/pydantic_ai_agent.py) |
-| LlamaIndex | `llamaindex` | `from astromesh_okf.integrations.llamaindex import okf_tools` | [llamaindex_agent.py](examples/llamaindex_agent.py) |
-| smolagents | `smolagents` | `from astromesh_okf.integrations.smolagents import okf_tools` | [smolagents_agent.py](examples/smolagents_agent.py) |
-| Microsoft Agent Framework | `agent-framework` | `from astromesh_okf.integrations.agent_framework import okf_tools` | [agent_framework_agent.py](examples/agent_framework_agent.py) |
-| MCP (Claude Desktop, Claude Code, Cursor, cualquier cliente MCP) | `mcp` | `astromesh-okf mcp ./my-bundle` | [examples/mcp/](examples/mcp/claude_desktop_config.json) |
-| Cualquier cosa que acepte funciones Python | ninguno | `OKFTools("./my-bundle").functions()` | [plain_python.py](examples/plain_python.py) |
+| LangChain / LangGraph | `langchain` | `from astromesh_okf.integrations.langchain import okf_tools` | [langgraph_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/langgraph_agent.py) |
+| CrewAI | `crewai` | `from astromesh_okf.integrations.crewai import okf_tools` | [crewai_crew.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/crewai_crew.py) |
+| Google ADK | `adk` | `from astromesh_okf.integrations.adk import okf_tools` | [adk_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/adk_agent.py) |
+| OpenAI Agents SDK | `openai-agents` | `from astromesh_okf.integrations.openai_agents import okf_tools` | [openai_agents_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/openai_agents_agent.py) |
+| PydanticAI (Python 3.11+) | `pydantic-ai` | `from astromesh_okf.integrations.pydantic_ai import okf_tools` | [pydantic_ai_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/pydantic_ai_agent.py) |
+| LlamaIndex | `llamaindex` | `from astromesh_okf.integrations.llamaindex import okf_tools` | [llamaindex_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/llamaindex_agent.py) |
+| smolagents | `smolagents` | `from astromesh_okf.integrations.smolagents import okf_tools` | [smolagents_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/smolagents_agent.py) |
+| Microsoft Agent Framework | `agent-framework` | `from astromesh_okf.integrations.agent_framework import okf_tools` | [agent_framework_agent.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/agent_framework_agent.py) |
+| MCP (Claude Desktop, Claude Code, Cursor, cualquier cliente MCP) | `mcp` | `astromesh-okf mcp ./my-bundle` | [examples/mcp/](https://github.com/monaccode/astromesh-okf/blob/main/examples/mcp/claude_desktop_config.json) |
+| Cualquier cosa que acepte funciones Python | ninguno | `OKFTools("./my-bundle").functions()` | [plain_python.py](https://github.com/monaccode/astromesh-okf/blob/main/examples/plain_python.py) |
 
 Se instala con `pip install 'astromesh-okf[<extra>]'`. Cada `okf_tools(bundle, prefix="")`
 devuelve los objetos de tool propios del framework; los snippets de abajo asumen
 `SYSTEM = "Answer using the knowledge base tools. Bundle index:\n" + Bundle("./my-bundle").index("/")`.
-Los paquetes de modelos van aparte: ver [docs/integrations.md](docs/integrations.md).
+Los paquetes de modelos van aparte: ver [docs/integrations.md](https://github.com/monaccode/astromesh-okf/blob/main/docs/integrations.md).
 
 **CrewAI**
 
@@ -298,7 +304,10 @@ tiene, uno sintetizado con el formato de OKF §8: subdirectorios y después conc
   "description": "Customers can ask for a full refund within 30 days of purchase.",
   "status": "stable", "trust": "human-reviewed", "stale": false,
   "tags": ["support", "refunds"], "warnings": [],
-  "extra": {"generated": {"by": "human:support-lead", "at": "2026-09-01T12:00:00+00:00"}},
+  "extra": {
+    "generated": {"by": "human:support-lead", "at": "2026-09-01T12:00:00+00:00"},
+    "verified": {"by": "human:support-lead", "at": "2026-09-01T12:00:00+00:00"}
+  },
   "body": "# Rule\n\nA full refund is available within 30 days...",
   "links": [{"id": "products/plans", "exists": true}, {"id": "policies/refunds-2024", "exists": true}]
 }
@@ -331,7 +340,7 @@ tools = okf_tools("./support-kb", prefix="support_") + okf_tools("./finance-kb",
 # support_kb_index, support_kb_read, support_kb_find, finance_kb_index, ...
 ```
 
-Referencia completa (en inglés): [docs/tools.md](docs/tools.md).
+Referencia completa (en inglés): [docs/tools.md](https://github.com/monaccode/astromesh-okf/blob/main/docs/tools.md).
 
 ## Confianza y frescura
 
@@ -395,14 +404,14 @@ que nunca levante excepciones y que se comporte igual en muchos frameworks y en 
 
 ## Contribuir
 
-Issues y pull requests son bienvenidos. Ver [CONTRIBUTING.md](CONTRIBUTING.md) (en inglés)
+Issues y pull requests son bienvenidos. Ver [CONTRIBUTING.md](https://github.com/monaccode/astromesh-okf/blob/main/CONTRIBUTING.md) (en inglés)
 para el setup, los tests y cómo agregar un adaptador de framework. Documentación (en
-inglés): [concepts](docs/concepts.md), [tools](docs/tools.md),
-[integrations](docs/integrations.md), [FAQ](docs/faq.md).
+inglés): [concepts](https://github.com/monaccode/astromesh-okf/blob/main/docs/concepts.md), [tools](https://github.com/monaccode/astromesh-okf/blob/main/docs/tools.md),
+[integrations](https://github.com/monaccode/astromesh-okf/blob/main/docs/integrations.md), [FAQ](https://github.com/monaccode/astromesh-okf/blob/main/docs/faq.md).
 
 ## Licencia
 
-[Apache-2.0](LICENSE).
+[Apache-2.0](https://github.com/monaccode/astromesh-okf/blob/main/LICENSE).
 
 ---
 

@@ -34,7 +34,7 @@ tags: [support, refunds]
 status: stable
 generated: { by: human:support-lead, at: 2026-09-01T12:00:00Z }
 verified: { by: human:support-lead, at: 2026-09-01T12:00:00Z }
-stale_after: 2027-09-01T00:00:00Z
+stale_after: 2030-09-01T00:00:00Z
 ---
 
 # Rule
@@ -58,7 +58,9 @@ the library does not map (`generated`, `verified`, your own) is returned in `ext
 | `status` | `stable`, `draft` or `deprecated` | `stable` |
 | `verified` | one event or a list of events `{by, at}` | unverified |
 | `stale_after` | date or datetime after which the concept may be outdated | never stale |
-| `generated` | `{by, at}` provenance; v0.1's `timestamp` is accepted | none |
+
+`generated` (`{by, at}` provenance) and v0.1's `timestamp` are not interpreted: they are
+passed through in `extra`. (`verified` is both: it sets `trust` and is also in `extra`.)
 
 ## Links
 
@@ -102,7 +104,7 @@ Every concept the tools return carries four signals:
 - **`status`**: lowercased; `stable` when absent.
 - **`warnings`** (in `kb_read`): one sentence per problem, for the model to repeat:
   - `DEPRECATED: kept for history; do not use for new work.`
-  - `STALE since 2027-09-01T00:00:00+00:00: may no longer be accurate.`
+  - `STALE since 2030-09-01T00:00:00+00:00: may no longer be accurate.`
   - `DRAFT: not reviewed; may be incomplete.`
 
 The signals annotate; they never hide a concept from `kb_read` or `kb_index`. Only

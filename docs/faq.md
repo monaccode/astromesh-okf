@@ -68,9 +68,12 @@ tools apply their own defaults when an argument is missing.
 
 ### The model keeps sending `"2"` or `"false"` as strings. Do I need to fix my prompt?
 
-No. The tools coerce loose arguments: numeric strings become numbers, a single tag becomes
-a list, and `"true"`/`"1"`/`"yes"` mean true. See
-[argument coercion](tools.md#argument-coercion).
+No. Where the framework passes arguments through (plain functions, LlamaIndex, smolagents,
+Google ADK) the tools coerce them: numeric strings become numbers, a single tag becomes a
+list, and `"true"`/`"1"`/`"yes"` mean true. LangChain, CrewAI, OpenAI Agents, Agent
+Framework, PydanticAI and MCP validate against the schema first: they accept `"2"` and
+`"false"`, and reject what they cannot parse (`limit="many"`) with an error the model sees
+and can correct. See [argument coercion](tools.md#argument-coercion).
 
 ### Is it safe to mount a bundle I didn't write?
 

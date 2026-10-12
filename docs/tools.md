@@ -98,7 +98,11 @@ during the scan. Hidden files, dot-directories, `index.md` and `log.md` are neve
 
 ## Argument coercion
 
-Models send loose arguments. The tools accept them:
+Models send loose arguments. Whether the tool layer sees them depends on the framework.
+
+**Passed through, coerced by the tools:** plain functions and `OKFTools`, LlamaIndex,
+smolagents and Google ADK hand the model's arguments to the tool as-is. The tools accept
+them:
 
 | Received | Used as |
 |---|---|
@@ -109,6 +113,13 @@ Models send loose arguments. The tools accept them:
 | `include_deprecated="true"` / `"1"` / `"yes"` | `true`; any other string is `false` |
 | `text=5`, `type=7` | `"5"`, `"7"` |
 | `path=None` | `"/"` |
+
+**Validated by the framework first:** LangChain, CrewAI, OpenAI Agents, Microsoft Agent
+Framework, PydanticAI and MCP check arguments against the tool's schema (pydantic, lax
+mode) before calling it. `limit="2"` and `include_deprecated="false"` parse and reach the
+tool as `2` and `False`; `limit="many"` or `tags="finance"` are rejected, and the framework
+reports the validation error to the model as the tool result (or a retry prompt, in
+PydanticAI) instead of ending the run. The model can then call again with fixed arguments.
 
 ## Errors
 
