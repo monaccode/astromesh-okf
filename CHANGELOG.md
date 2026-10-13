@@ -26,5 +26,11 @@ All notable changes to this project are documented here. The format follows
 - CI: core tests on Python 3.10–3.13, one job per extra, and a check that reads Google's
   four sample bundles with zero concepts skipped.
 
+### Security
+
+- Frontmatter with YAML anchors or aliases (including merge keys `<<: *name`) is rejected as an
+  invalid concept, so a hostile bundle cannot expand into gigabytes or a self-referencing
+  structure. Error messages never include absolute filesystem paths.
+
 [Unreleased]: https://github.com/monaccode/astromesh-okf/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/monaccode/astromesh-okf/releases/tag/v0.1.0

@@ -47,6 +47,10 @@ Only `type` is required. A file without parseable frontmatter (or whose frontmat
 a mapping) or without `type` is invalid; indexes and search skip it and count it. Any field
 the library does not map (`generated`, `verified`, your own) is returned in `extra`.
 
+YAML anchors and aliases (`&name` / `*name`, including merge keys `<<: *name`) are rejected:
+a concept that uses them is invalid. Aliases let a few bytes expand into gigabytes or a
+self-referencing structure, and a bundle may come from someone you do not control.
+
 ## Frontmatter the library uses
 
 | Field | Meaning | Default |
