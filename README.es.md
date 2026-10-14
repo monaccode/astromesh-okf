@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/monaccode/astromesh-okf/main/assets/logo.png" alt="Astromesh OKF" width="640">
+</p>
+
 # astromesh-okf
 
 **Que tus agentes *naveguen* el conocimiento en vez de recuperar fragmentos.**
