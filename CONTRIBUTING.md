@@ -71,10 +71,15 @@ uv run ruff format .           # writes the fix
 
 1. Bump `version` in `pyproject.toml` and `__version__` in `astromesh_okf/__init__.py`, run
    `uv lock`, and move `[Unreleased]` in `CHANGELOG.md` to a dated version section.
-2. Tag `vX.Y.Z` and push the tag. `.github/workflows/release.yml` builds with `uv build` and
-   publishes to PyPI with trusted publishing.
+2. Tag `vX.Y.Z` and push the tag. `.github/workflows/release.yml` runs the tests and lint,
+   checks that the tag matches the version, builds with `uv build`, publishes to TestPyPI,
+   installs that build from TestPyPI and runs the CLI against the sample bundle, and only then
+   publishes to PyPI. Both uploads use trusted publishing and skip files that already exist,
+   so re-running a release is safe. The workflow can also be started by hand from `main`
+   (`workflow_dispatch`), e.g. to put an already-published version on TestPyPI.
 
-Trusted publishing needs a one-time setup by a PyPI maintainer: register a publisher for
-the `astromesh-okf` project with owner `monaccode`, repository `astromesh-okf`, workflow
-`release.yml` and environment `pypi`, and create the `pypi` environment in the GitHub
-repository settings. Until then the release workflow fails at the publish step.
+Trusted publishing needs a one-time setup by a maintainer, on both indexes: register a
+publisher for the `astromesh-okf` project with owner `monaccode`, repository
+`astromesh-okf` and workflow `release.yml` — environment `testpypi` on test.pypi.org and
+environment `pypi` on pypi.org — and create both environments in the GitHub repository
+settings. Until then the workflow fails at the matching publish step.
