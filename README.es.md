@@ -6,7 +6,8 @@
 
 **Que tus agentes *naveguen* el conocimiento en vez de recuperar fragmentos.**
 
-[![PyPI](https://img.shields.io/pypi/v/astromesh-okf)](https://pypi.org/project/astromesh-okf/)
+[![PyPI](https://img.shields.io/pypi/v/astromesh-okf?label=PyPI)](https://pypi.org/project/astromesh-okf/)
+[![TestPyPI](https://img.shields.io/pypi/v/astromesh-okf?label=TestPyPI&pypiBaseUrl=https://test.pypi.org)](https://test.pypi.org/project/astromesh-okf/)
 [![Python](https://img.shields.io/pypi/pyversions/astromesh-okf)](https://pypi.org/project/astromesh-okf/)
 [![CI](https://github.com/monaccode/astromesh-okf/actions/workflows/ci.yml/badge.svg)](https://github.com/monaccode/astromesh-okf/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/monaccode/astromesh-okf/blob/main/LICENSE)
